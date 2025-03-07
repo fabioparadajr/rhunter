@@ -10,8 +10,7 @@ fn main() {
 
 ###### Leitura dos eventos ################
 CloseNowrite -> abriu e não escreveu( posso ignorar)
-Quando abre o arquivo cria arquivo.txt.swp, e nele aparece modify e depois deleted.
-            
+Quando abre o arquivo cria arquivo.txt.swp, e nele aparece modify e depois deleted.        
     
  */ 
     let primary_path = PathBuf::from("/home/fabio/teste_av");
