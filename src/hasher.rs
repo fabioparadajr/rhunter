@@ -1,5 +1,4 @@
-
-use sha2::{Sha256, Digest};
+use sha2::{Digest, Sha256};
 use std::fs::File;
 use std::io::{self, Read};
 use std::path::PathBuf;
@@ -18,7 +17,8 @@ pub fn get_file_hash(file_path: &PathBuf) -> Result<String, io::Error> {
     }
 
     let hash = hasher.finalize();
-    let hash_hex = hash.iter()
+    let hash_hex = hash
+        .iter()
         .map(|byte| format!("{:02x}", byte))
         .collect::<String>();
 

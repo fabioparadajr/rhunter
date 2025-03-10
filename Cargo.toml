@@ -8,3 +8,4 @@ fanotify-rs = "0.3.1"
 tokio = { version = "1.43", features = ["full"] }
 sha2 = "0.10.8"
 chrono = "0.4.40"
+regex = "1.11.1"

@@ -3,6 +3,7 @@ use fanotify::{low_level::*,  high_level::*};
 use hasher::get_file_hash;
 use logger::scriber;
 use std::path::PathBuf;
+use regex::Regex;
 
 mod hasher;
 mod logger;
@@ -10,7 +11,27 @@ fn main() {
 /* ###### PERMISSION ##### binary to have similar priviliges as root: sudo setcap cap_sys_admin=eip rhunter
 
  */ 
-    let primary_path = PathBuf::from("/home/fabio/teste_av");
+let rgx: Regex = Regex::new(r"^(/([a-z0-9_-]+/)*[a-z0-9_-]+)?/$").unwrap();
+let path ;
+loop {
+    println!("Hello, type a path to monitor: ");
+    let mut input = String::new();
+    std::io::stdin().read_line(&mut input).unwrap();
+    let input_trim = input.trim();
+
+    if rgx.is_match(&input_trim) {
+        path = String::from(input_trim);
+        println!("Path: {}", path);
+
+        break;
+    } else {
+        println!("Ops! You didn't type right.");
+    }
+}
+
+
+ 
+    let primary_path = PathBuf::from(path);
     let ft = Fanotify::new_nonblocking(FanotifyMode::NOTIF).expect("Error regitering fanotify listener");
     let _real_path = ft.add_path(
         FAN_ACCESS | FAN_CLOSE | FAN_EVENT_ON_CHILD | FAN_MODIFY | FAN_ONDIR,
