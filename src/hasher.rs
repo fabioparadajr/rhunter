@@ -2,9 +2,10 @@ use sha2::{Digest, Sha256};
 use std::fs::File;
 use std::io::{self, Read};
 use std::path::PathBuf;
+use crate::Arc;
 
-pub fn get_file_hash(file_path: &PathBuf) -> Result<String, io::Error> {
-    let mut file = File::open(file_path)?;
+pub fn get_file_hash(file_path: Arc<PathBuf>) -> Result<String, io::Error> {
+    let mut file = File::open(file_path.as_path())?;
     let mut hasher = Sha256::new();
     let mut buffer = [0; 8192];
 

@@ -3,8 +3,10 @@ use fanotify::high_level::*;
 use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::PathBuf;
+use crate::Arc;
 
-pub fn scriber(event: &Vec<FanEvent>, event_path: &PathBuf) -> Result<(), std::io::Error> {
+
+pub fn scriber(event: &Vec<FanEvent>, event_path: Arc<PathBuf>) -> Result<(), std::io::Error> {
     let local: DateTime<Local> = Local::now();
     let mut file = OpenOptions::new()
         .append(true)

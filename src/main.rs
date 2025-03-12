@@ -2,14 +2,13 @@
 use fanotify::{low_level::*,  high_level::*};
 use hasher::get_file_hash;
 use logger::scriber;
-use std::path::PathBuf;
+use std::{path::PathBuf, sync::Arc};
 use regex::Regex;
 
 mod hasher;
 mod logger;
 fn main() {
 /* ###### PERMISSION ##### binary to have similar priviliges as root: sudo setcap cap_sys_admin=eip rhunter
-
  */ 
 let rgx: Regex = Regex::new(r"^(/([a-z0-9_-]+/)*[a-z0-9_-]+)?/$").unwrap();
 let path ;
@@ -46,18 +45,21 @@ loop {
         for events in eventos {
             
             let write = FanEvent::CloseWrite;    
-            let file_path = PathBuf::from(&events.path);
-            scriber(&events.events, &file_path);
+            let file_path = Arc::new(PathBuf::from(&events.path));
+            //let file_path = PathBuf::from(&events.path);
+            scriber(&events.events, Arc::clone(&file_path));
             if events.events.contains(&write) && !events.path.contains("swp") && file_path.is_file()
             {
 
                 println!("File changed: {:?}", events.path );
                
-                   let hsh =  match get_file_hash(&file_path)
+                   let hsh =  match get_file_hash(Arc::clone(&file_path))
                    {
                         Ok(hex) => println!("hash: {hex}"),
                         Err(e) => println!("Couldnt hash the file")
                     };
+
+                   
                 
 
             } else if file_path.is_dir() && !directories.contains(&file_path){ // Need to be a dir and not inside the vector.
@@ -71,7 +73,7 @@ loop {
                 directories.push(new_path.clone());
                 ft.add_path(
                     FAN_ACCESS | FAN_CLOSE | FAN_EVENT_ON_CHILD | FAN_MODIFY | FAN_ONDIR,
-                    &file_path,
+                    Arc::clone(&file_path).as_path(),
                 ).unwrap();
                 
                 
