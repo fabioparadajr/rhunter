@@ -1,4 +1,5 @@
 
+use elf::file;
 use fanotify::{low_level::*,  high_level::*};
 use hasher::get_file_hash;
 use logger::scriber;
@@ -9,6 +10,7 @@ mod hasher;
 mod logger;
 fn main() {
 /* ###### PERMISSION ##### binary to have similar priviliges as root: sudo setcap cap_sys_admin=eip rhunter
+
  */ 
 let rgx: Regex = Regex::new(r"^(/([a-z0-9_-]+/)*[a-z0-9_-]+)?/$").unwrap();
 let path ;
@@ -46,8 +48,8 @@ loop {
             
             let write = FanEvent::CloseWrite;    
             let file_path = Arc::new(PathBuf::from(&events.path));
-            //let file_path = PathBuf::from(&events.path);
-            scriber(&events.events, Arc::clone(&file_path));
+            
+            scriber(&events.events, &file_path);
             if events.events.contains(&write) && !events.path.contains("swp") && file_path.is_file()
             {
 
@@ -68,9 +70,9 @@ loop {
                 but I don't need that. 
               Since the events dynamically show any changes in the directories, they will automatically be added to the vector and start monitoring."
                  */  
-                println!("Novo diretorio adicionado ao monitoramento: {:?}", file_path);
-                let new_path = PathBuf::from(&events.path);
-                directories.push(new_path.clone());
+                println!("New Dir add to monitor {:?}", file_path);
+                
+                directories.push(Arc::clone(&file_path).to_path_buf());
                 ft.add_path(
                     FAN_ACCESS | FAN_CLOSE | FAN_EVENT_ON_CHILD | FAN_MODIFY | FAN_ONDIR,
                     Arc::clone(&file_path).as_path(),
