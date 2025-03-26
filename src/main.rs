@@ -1,5 +1,5 @@
 use monitor::monitor_dir;
-use std::{path::PathBuf, sync::Arc};
+use std::{path::PathBuf, sync::Arc, time::Instant};
 use regex::Regex;
 
 mod monitor;
@@ -9,6 +9,7 @@ fn main() {
 /* ###### PERMISSION ##### binary to have similar priviliges as root: sudo setcap cap_sys_admin=eip rhunter
 
  */ 
+
 let rgx: Regex = Regex::new(r"^(/([a-z0-9_-]+/)*[a-z0-9_-]+)?/$").unwrap();
 let path ;
 loop {
@@ -30,5 +31,8 @@ loop {
 
     monitor_dir(path);
 
+
+
+    
     
     }
